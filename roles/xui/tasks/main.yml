@@ -1,0 +1,45 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install dependencies
+  apt:
+    name:
+      - curl
+      - wget
+    state: present
+
+- name: Install X-ui
+  shell: |
+    yes n | bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
+  args:
+    executable: /bin/bash
+
+- name: Enable and start X-ui service
+  systemd:
+    name: x-ui
+    enabled: yes
+    state: started
+
+- name: Copy backup database to server
+  copy:
+    src: "{{ playbook_dir }}/roles/xui/files/x-ui.db"
+    dest: /etc/x-ui/x-ui.db
+    mode: 0644
+  when: backup_db is defined and backup_db
+
+- name: Configure x-ui settings
+  shell: |
+    /usr/local/x-ui/x-ui setting -port 9001 # -username {{ lookup('env', 'XUI_USERNAME') }} -password {{ lookup('env', 'XUI_PASSWD') }}
+  async: 1
+  poll: 0
+  changed_when: false
+  args:
+    executable: /bin/bash
+
+- name: Restart X-ui service
+  systemd:
+    name: x-ui
+    state: restarted
+  when: backup_db is defined and backup_db

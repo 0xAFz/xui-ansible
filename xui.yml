@@ -1,0 +1,8 @@
+---
+- name: Install X-ui
+  hosts: all
+  become: yes
+  vars:
+    backup_db: true  # Set this to true if you have a backup database to restore
+  roles:
+    - xui
