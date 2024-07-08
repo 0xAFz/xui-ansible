@@ -32,9 +32,9 @@
 - name: Configure x-ui settings
   shell: |
     /usr/local/x-ui/x-ui setting -port 9001 # -username {{ lookup('env', 'XUI_USERNAME') }} -password {{ lookup('env', 'XUI_PASSWD') }}
-  async: 1
-  poll: 0
-  changed_when: false
+  # async: 1
+  # poll: 0
+  # changed_when: false
   args:
     executable: /bin/bash
 
